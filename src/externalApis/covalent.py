@@ -1,18 +1,19 @@
 import logging
+import os
+
 from json.decoder import JSONDecodeError
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
+from src.constants.keys import COVALENT_KEY
 from src.logging import LogsAdapter
 from src.typing import ChecksumAVAXAddress
 
-CONST_RETRY = 3
+CONST_RETRY = 0
 DATE_FORMAT_COVALENT = '%Y-%m-%dT%H:%M:%SZ'
 COVALENT_QUERY_LIMIT = 200
 PAGESIZE = 100
-
-KEY = 'ckey_2df4b999249440b79b5a244145b'
 
 logger = logging.getLogger(__name__)
 log = LogsAdapter(logger)
@@ -32,7 +33,7 @@ class Covalent():
             action: str,
             address: str = None,
             options: Optional[Dict[str, Any]] = None,
-            timeout: Optional[Tuple[int, int]] = 35,
+            timeout: Optional[Tuple[int, int]] = 10,
     ) -> Optional[Dict[str, Any]]:
         """Queries Covalent
         May raise:
@@ -44,6 +45,8 @@ class Covalent():
             query_str += f'/{address}'
         query_str += f'/{module}/'
 
+        # If exists covalent key in env, it will use it
+        KEY = os.environ.get('COVALENT_KEY', COVALENT_KEY)
         query_str += f'?key={KEY}'
 
         if options:
@@ -52,7 +55,7 @@ class Covalent():
 
         retry = 0
         while retry <= CONST_RETRY:
-            log.debug(f'Querying covalent: {query_str}')  # noqa: E501 lgtm [py/clear-text-logging-sensitive-data]
+            log.debug(f'Querying covalent: {query_str}')
             try:
                 response = self.session.get(
                     query_str, 
@@ -96,7 +99,7 @@ class Covalent():
             self,
             address: ChecksumAVAXAddress,
     ) -> Optional[List[Dict[str, Any]]]:
-        options = {'limit': COVALENT_QUERY_LIMIT, "nft": True, 'page-size': PAGESIZE}
+        options = {'limit': COVALENT_QUERY_LIMIT, "nft": True, "match": '{type:nft}', 'page-size': PAGESIZE}
         result = self._query(
             module='balances_v2',
             address=address,
@@ -105,13 +108,9 @@ class Covalent():
         )
 
         if result is None:
-            return []
-
-        def filter_nfts(value):
-            return value["type"] == "nft"
+            return None
 
         try:
-            items = list(filter(filter_nfts, result["data"]["items"]))
-            return items
+            return result["data"]["items"]
         except KeyError:
             return []

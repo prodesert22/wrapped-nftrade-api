@@ -154,12 +154,13 @@ class Api_functions():
         return r
     
     def get_nfts_user(self, address: ChecksumAVAXAddress, chainID: str = "43114") -> Dict[str, Any]:
-        # Covalent is disabled as it goes through instabilities
-        # covalent = Covalent(chainID)
-        # result = covalent.get_nft_balances_address(address)
+        result = None
+        covalent = Covalent(chainID)
+        result = covalent.get_nft_balances_address(address)
         
-        # Temporary function to replace the covalent
-        result = self._patch(address, chainID)
+        # Fallback
+        if (result is None):
+            result = self._patch(address, chainID)
         
         if len(result) == 0:
             return {"address": address, "chainID": chainID, "items": []}
