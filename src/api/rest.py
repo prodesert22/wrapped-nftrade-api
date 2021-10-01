@@ -36,7 +36,7 @@ def api_response(
         data = json.dumps(result)
         
     return make_response(
-        (data, status_code, {"mimetype": "application/json", "Content-Type": "application/json"}),
+        (data, status_code, {"mimetype": "application/json", "Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}),
     )
 
 class RestAPI():
