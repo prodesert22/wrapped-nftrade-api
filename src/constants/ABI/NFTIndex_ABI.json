@@ -34,11 +34,11 @@
          },
          {
             "type":"string[]",
-            "name":"_urls",
+            "name":"_uris",
             "internalType":"string[]"
          }
       ],
-      "name":"getNFTIndexAndUrl",
+      "name":"getNFTIndexAndURI",
       "inputs":[
          {
             "type":"address",
@@ -59,7 +59,7 @@
          {
             "type":"tuple[]",
             "name":"_nft",
-            "internalType":"struct NFTIndexAndUrl.Nft[]",
+            "internalType":"struct NFTIndexAndUri.Nft[]",
             "components":[
                {
                   "type":"address",
@@ -73,13 +73,13 @@
                },
                {
                   "type":"string",
-                  "name":"url",
+                  "name":"uri",
                   "internalType":"string"
                }
             ]
          }
       ],
-      "name":"getNFTsIndexAndUrl",
+      "name":"getNFTsIndexAndUri",
       "inputs":[
          {
             "type":"address[]",

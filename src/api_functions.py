@@ -172,7 +172,7 @@ class Api_functions():
         # List of addresses of nft contracts  
         nfts_contracts_address = list(map(lambda x: x["contract_address"], result))
         # Get nfts uris by NFT INDEX contract
-        nfts_user = nftindex_contract.functions.getNFTsIndexAndUrl(nfts_contracts_address, address)
+        nfts_user = nftindex_contract.functions.getNFTsIndexAndUri(nfts_contracts_address, address)
         
         items = self._parallel_requests(nfts_user, result, 16)
         
