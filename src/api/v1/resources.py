@@ -6,13 +6,13 @@ from typing import Any, Dict, List, Optional, Union
 from webargs.flaskparser import parser, use_kwargs
 from webargs.multidictproxy import MultiDictProxy
 
-import urllib
-
 from src.typing import ChecksumAVAXAddress
 from src.api.app import cache
 from src.api.rest import RestAPI
 from src.api.v1.encoding import (
-    NFTsUserSchema
+    NFTsUserSchema,
+    PostVaultSchema,
+    GetVaultsSchema,
 )
 
 def _combine_parser_data(
@@ -71,7 +71,14 @@ def create_blueprint() -> Blueprint:
     return Blueprint('v1_resources', __name__)
 
 def cache_key():
-   return flask_request.base_url
+    url_args = flask_request.args
+    args = "?"
+    args += '&'.join(
+        f"{item[0]}={item[1]}" for item in url_args.items()
+    )
+    if args != "?":
+        return flask_request.base_url+args
+    return flask_request.base_url
 
 class BaseResource(Resource):
     def __init__(self, rest_api_object: RestAPI, **kwargs: Any) -> None:
@@ -85,3 +92,44 @@ class NFTsUserResource(BaseResource):
     @use_kwargs(get_schema, location='json_and_query_and_view_args')
     def get(self, chainID: str, address: str) -> Response:
         return self.rest_api.getnfts(address, chainID)
+
+class VaultResource(BaseResource):
+    get_schema = NFTsUserSchema()
+
+    @cache.cached(timeout=60, key_prefix=cache_key)
+    @use_kwargs(get_schema, location='json_and_query_and_view_args')
+    def get(self, chainID: str, address: str) -> Response:
+        return self.rest_api.getVault(address=address, chainID=chainID)
+    
+    post_schema = PostVaultSchema()
+    @use_kwargs(post_schema, location='json')
+    def post(self,
+            chainID: str,
+            name: str,
+            symbol: str,
+            supply: str,
+            price: int,
+            fee: int,
+            contract_address: str,
+            curator_address: str,
+            nfts: list[Dict[str, Any]],
+    ) -> Response:
+        vault = {
+            "name": name,
+            "symbol": symbol,
+            "supply": supply,
+            "price": price,
+            "fee": fee,
+            "contract_address": contract_address,
+            "curator_address": curator_address,
+            "nfts": nfts,
+        }
+        return self.rest_api.insert_vault(chainID=chainID, vault=vault)        
+
+class VaultsResource(BaseResource):
+    get_schema = GetVaultsSchema()
+    
+    @cache.cached(timeout=60, key_prefix=cache_key)
+    @use_kwargs(get_schema, location='json_and_query_and_view_args')
+    def get(self, chainID: str, page: int, perpage: int) -> Response:
+        return self.rest_api.getVaults(chainID=chainID, page=page, perpage=perpage)
