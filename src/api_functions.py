@@ -33,31 +33,33 @@ class Api_functions():
 
         if (result is None or len(result) == 0):
             return {"address": address, "chainID": chainID, "items": []}
-        
+
         items = []
         for nft in result:
-            if nft["balance"] != 0:
+            if (int(nft["balance"]) > 0 and ("nft_data" in nft)):
                 for nftdata in nft["nft_data"]:
                     image = ""
-                    if nftdata["token_url"].startswith("data:"):
+                    if ("token_url" in nftdata) and nftdata["token_url"].startswith("data:"):
                         uri = DataURI(nftdata["token_url"])
                         if (uri.mimetype.startswith("image")):
                             image = uri.data
                         elif (uri.mimetype.startswith("application/json")):
                             json_dict = json.loads(uri.data)
-                            if "image" in json_dict.keys():
+                            if ("image" in json_dict):
                                 image = json_dict["image"]
-                    else:
+                    elif ("external_data" in nftdata) and ("image" in nftdata["external_data"]):
                         image = nftdata["external_data"]["image"]
-                    items.append({
-                        "address": nft["contract_address"],
-                        "name": nft["contract_name"],
-                        "symbol": nft["contract_ticker_symbol"],
-                        "tokenId": nftdata["token_id"],
-                        "ImageURL": image,
-                        "URI": nftdata["token_url"],
-                    })
-
+                    try:
+                        items.append({
+                            "address": nft["contract_address"],
+                            "name": nft["contract_name"],
+                            "symbol": nft["contract_ticker_symbol"],
+                            "tokenId": nftdata["token_id"],
+                            "ImageURL": image,
+                            "URI": nftdata["token_url"],
+                        })
+                    except:
+                        continue
         return {"address": address, "chainID": int(chainID), "items": items}
 
     def getVaults(self, chainID: str = "43114", page: int = 1, perpage: int = 15):
