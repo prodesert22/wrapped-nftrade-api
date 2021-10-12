@@ -46,6 +46,11 @@ def app_args(prog: str, description: str) -> argparse.ArgumentParser:
         default='debug',
     )
     p.add_argument(
+        '--covalent-key',
+        help='The covalent key to use in query',
+        default='',
+    )
+    p.add_argument(
         'version',
         help='Shows the rotkehlchen version',
         action=CommandAction,

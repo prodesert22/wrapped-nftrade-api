@@ -10,6 +10,10 @@ from src.api_functions import Api_functions
 logger = logging.getLogger(__name__)
 log = LogsAdapter(logger)
 
+class No_covalent_key(Exception):
+    def __str__(self):
+        return "No gived covalent key on env/args"
+
 class Server():
     def __init__(self) -> None:
         """Initializes the backend server
@@ -24,6 +28,15 @@ class Server():
             ),
         )
         self.args = arg_parser.parse_args()
+        
+        covalent_key = os.environ.get('COVALENT_KEY', "")
+        if (self.args.covalent_key != ""):
+            os.environ["COVALENT_KEY"] = self.args.covalent_key
+
+        if (covalent_key == "" and self.args.covalent_key == ""):
+            raise No_covalent_key()
+        
+        
         self.api_functions = Api_functions(self.args)
         self.api_server = APIServer(
             rest_api=RestAPI(api_functions=self.api_functions),
