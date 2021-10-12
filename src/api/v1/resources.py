@@ -112,7 +112,7 @@ class VaultResource(BaseResource):
             fee: int,
             contract_address: str,
             curator_address: str,
-            nfts: list[Dict[str, Any]],
+            nfts: List[Dict[str, Any]],
     ) -> Response:
         vault = {
             "name": name,
