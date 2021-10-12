@@ -6,13 +6,15 @@ verify_ssl = true
 ethlite = "*"
 gevent = "*"
 marshmallow = "*"
-webargs = "*"
 eth-utils = "*"
 eth-typing = "*"
 Flask = "*"
 Flask-Caching = "*"
 Flask-RESTful = "*"
+flask_sqlalchemy = "*"
+python-datauri = "*"
+webargs = "*"
 Werkzeug = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3"

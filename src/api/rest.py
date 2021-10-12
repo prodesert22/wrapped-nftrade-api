@@ -44,4 +44,31 @@ class RestAPI():
         self.api_functions = api_functions
     
     def getnfts(self, address: ChecksumAVAXAddress, chainID: str) -> Dict[str, Any]:
-        return api_response(_wrap_in_ok_result(self.api_functions.get_nfts_user(address, chainID)))
+        return api_response(
+            _wrap_in_ok_result(
+                self.api_functions.get_nfts_user(address, chainID)
+            )
+        )
+    
+    def getVault(self, address: ChecksumAVAXAddress, chainID: str):
+        return api_response(
+            _wrap_in_ok_result(
+                self.api_functions.getVault(address, chainID)
+            )
+        )
+    
+    def insert_vault(self, chainID: str, vault: Dict[str, Any]):
+        success, message = self.api_functions.insertVault(chainID=chainID, vault=vault)
+        status_code = HTTPStatus.CREATED if success else HTTPStatus.BAD_REQUEST
+        return api_response(_wrap_in_result("", message), status_code)
+
+    def getVaults(self, chainID: str, page: int, perpage: int):
+        return api_response(
+            _wrap_in_ok_result(
+                self.api_functions.getVaults(
+                    chainID = chainID, 
+                    page = page, 
+                    perpage = perpage,
+                )
+            )
+        )
