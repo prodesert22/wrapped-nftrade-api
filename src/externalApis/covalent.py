@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
+from src.constants.keys import COVALENT_KEY
 from src.logging import LogsAdapter
 from src.typing import ChecksumAVAXAddress
 
@@ -32,7 +33,7 @@ class Covalent():
             action: str,
             address: str = None,
             options: Optional[Dict[str, Any]] = None,
-            timeout: Optional[Tuple[int, int]] = 20,
+            timeout: Optional[Tuple[int, int]] = 10,
     ) -> Optional[Dict[str, Any]]:
         """Queries Covalent
         May raise:
@@ -45,7 +46,7 @@ class Covalent():
         query_str += f'/{module}/'
 
         # If exists covalent key in env, it will use it
-        KEY = os.environ.get('COVALENT_KEY', "")
+        KEY = os.environ.get('COVALENT_KEY', COVALENT_KEY)
         query_str += f'?key={KEY}'
 
         if options:
@@ -111,28 +112,5 @@ class Covalent():
 
         try:
             return result["data"]["items"]
-        except:
-            return []
-
-    def get_transaction_by_vault_address(
-        self,
-        address: ChecksumAVAXAddress,
-        vault: str,
-    ) -> bool:
-        options = {
-            'limit': COVALENT_QUERY_LIMIT, 
-            "nft": True, 
-            "match": '{log_events.2.decoded.params.3.value:'+vault+'}',
-            'page-size': PAGESIZE
-        }
-        result = self._query(
-            module='transactions_v2',
-            address=address,
-            action='address',
-            options=options,
-            timeout=60
-        )
-        try:
-            return result["data"]["items"]
-        except:
+        except KeyError:
             return []

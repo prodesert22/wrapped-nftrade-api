@@ -20,8 +20,6 @@ from src.api.rest import RestAPI, api_response, wrap_in_fail_result
 from src.api.v1.parser import resource_parser
 from src.api.v1.resources import (
     NFTsUserResource,
-    VaultResource,
-    VaultsResource,
     create_blueprint,
 )
 
@@ -34,18 +32,6 @@ URLS = [
         '/<string:chainID>/getNftsUser/<string:address>', 
         NFTsUserResource, 
         "named_getNftsUser_resource"
-    ),
-    ('/vault', VaultResource),
-    (
-        '/<string:chainID>/vault', 
-        VaultResource, 
-        "named_vault_resource"
-    ),
-    ('/vaults', VaultsResource),
-    (
-        '/<string:chainID>/vaults', 
-        VaultsResource, 
-        "named_vaults_resource"
     ),
 ]
 
@@ -140,7 +126,7 @@ class APIServer():
         print(msg)
         log.info(msg)
         log.info('Local run')
-        self.flask_app.run(host=host, port=port, debug=True, **kwargs)
+        self.flask_app.run(host=host, port=port, **kwargs)
         
     def run_heroku(self) -> None:
         """This is only used  to run in heroku"""

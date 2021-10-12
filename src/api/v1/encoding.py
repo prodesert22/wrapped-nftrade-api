@@ -1,11 +1,11 @@
 import logging
 
 from eth_utils import to_checksum_address
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from marshmallow.exceptions import ValidationError
-from typing import Any, Dict, List, NamedTuple, Optional, Mapping
+from typing import Any, Optional, Mapping
 
-from src.constants.constants import SUPPORTED_CHAINS
+from src.constants.constants import SUPORTED_CHAINS
 from src.typing import ChecksumAVAXAddress
 
 log = logging.getLogger(__name__)
@@ -39,8 +39,8 @@ class ChainIdField(fields.Field):
             data: Optional[Mapping[str, Any]],  # pylint: disable=unused-argument
             **_kwargs: Any,
     ) -> str:
-        # Make sure that given value is an suported chain id
-        if str(value) in SUPPORTED_CHAINS:
+        # Make sure that given value is an ethereum address
+        if str(value) in SUPORTED_CHAINS:
             return value
         
         raise ValidationError(
@@ -51,26 +51,3 @@ class ChainIdField(fields.Field):
 class NFTsUserSchema(Schema):
     address = EthereumAddressField(load_default=None)
     chainID = ChainIdField(load_default="43114")
-
-class NftSchema(Schema):
-    address = EthereumAddressField(required=True)
-    name = fields.String(required=True)
-    symbol = fields.String(required=True)
-    tokenId = fields.String(required=True)
-    image = fields.String(required=True)
-
-class PostVaultSchema(Schema):
-    chainID = ChainIdField(required=True)
-    name = fields.String(required=True)
-    symbol = fields.String(required=True)
-    supply = fields.String(required=True)
-    price = fields.String(required=True)
-    fee = fields.String(required=True)
-    contract_address = EthereumAddressField(required=True)
-    curator_address = EthereumAddressField(required=True)
-    nfts = fields.List(fields.Nested(NftSchema), required=True)
-
-class GetVaultsSchema(Schema):
-    chainID = ChainIdField(required=True)
-    page = fields.Integer(load_default=1)
-    perpage = fields.Integer(load_default=15)
