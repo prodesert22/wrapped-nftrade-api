@@ -49,7 +49,7 @@ class ChainIdField(fields.Field):
         )
 
 class NFTsUserSchema(Schema):
-    address = EthereumAddressField(load_default=None)
+    address = EthereumAddressField(required=True)
     chainID = ChainIdField(load_default="43114")
 
 class NftSchema(Schema):
