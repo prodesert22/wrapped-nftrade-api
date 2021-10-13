@@ -107,6 +107,11 @@ class Api_functions():
     def insertVault(self, vault: Dict[str, Any], chainID: str = "43114") -> bool:
         covalent = Covalent(chainID)
 
+        # Check if exist this vault in db
+        result = self.query_vault(vault["contract_address"], chainID)
+        if (result):
+            return False, "Vault already exist in the db!"
+    
         # Check if not exist this vault in contract by logs events in transactions
         result = covalent.get_transaction_by_vault_address(
             address = VAULT_FACTORY_ADDRESS[chainID], 
@@ -114,11 +119,6 @@ class Api_functions():
         )
         if (len(result) != 1):
             return False, "Vault not exist!"
-        
-        # Check if exist this vault in db
-        result = self.query_vault(vault["contract_address"], chainID)
-        if (result):
-            return False, "Vault already exist in the db!"
         
         log.debug("Insert new vault: "+str(vault))
         try:
