@@ -41,7 +41,7 @@ class ChainIdField(fields.Field):
     ) -> str:
         # Make sure that given value is an suported chain id
         if str(value) in SUPPORTED_CHAINS:
-            return value
+            return str(value)
         
         raise ValidationError(
             f'Given value {value} is not suported chain',

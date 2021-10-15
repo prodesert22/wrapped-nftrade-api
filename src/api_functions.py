@@ -40,13 +40,16 @@ class Api_functions():
                 for nftdata in nft["nft_data"]:
                     image = ""
                     if ("token_url" in nftdata) and nftdata["token_url"].startswith("data:"):
-                        uri = DataURI(nftdata["token_url"])
-                        if (uri.mimetype.startswith("image")):
-                            image = uri.data
-                        elif (uri.mimetype.startswith("application/json")):
-                            json_dict = json.loads(uri.data)
-                            if ("image" in json_dict):
-                                image = json_dict["image"]
+                        try:
+                            uri = DataURI(nftdata["token_url"])
+                            if (uri.mimetype.startswith("image")):
+                                image = uri.data
+                            elif (uri.mimetype.startswith("application/json")):
+                                json_dict = json.loads(uri.data)
+                                if ("image" in json_dict):
+                                    image = json_dict["image"]
+                        except:
+                            image = ""
                     elif ("external_data" in nftdata) and ("image" in nftdata["external_data"]):
                         image = nftdata["external_data"]["image"]
                     try:
